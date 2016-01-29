@@ -14,28 +14,28 @@ $alpha  = [a-zA-Z]       -- alphabetic characters
 $newline = \n
  
 tokens :-
-	<0> $white+		  	    		{ skip }
-	<0> $digit+    					{ getNum }
-	<0> $alpha [$alpha $digit]*	    { getId }	
-	<0> "%" .* $newline	 			{ skip }
-	<0> "if" 						{ getIf }
-	<0> "then" 						{ getThen }
-	<0> "while" 					{ getWhile }
-	<0> "do" 						{ getDo }
-	<0> "input" 					{ getInput }
-	<0> "else" 						{ getElse }
-	<0> "begin" 					{ getBegin }
-	<0> "end" 						{ getEnd }
-	<0> "write" 					{ getWrite }	
+	<0> $white+		  		{ skip }
+	<0> "%" .* $newline	 		{ skip }
+	<0> "if" 				{ getIf }
+	<0> "then" 				{ getThen }
+	<0> "while" 				{ getWhile }
+	<0> "do" 				{ getDo }
+	<0> "input" 				{ getInput }
+	<0> "else" 				{ getElse }
+	<0> "begin" 				{ getBegin }
+	<0> "end" 				{ getEnd }
+	<0> "write" 				{ getWrite }	
+	<0> $digit+    				{ getNum }
+	<0> $alpha [$alpha $digit]*	    	{ getId }	
 	<0> "/*"                		{ nested_comment } 
-	<0> "+"  						{ getAdd }
-	<0> ":="  						{ getAssign }
-	<0> "-"  						{ getSub }
-	<0> "*"  						{ getMul }
-	<0> "/"  						{ getDiv }
-	<0> "("  						{ getLPar }
-	<0> ")"							{ getRPar }
-	<0> ";"							{ getSemi }
+	<0> "+"  				{ getAdd }
+	<0> ":="  				{ getAssign }
+	<0> "-"  				{ getSub }
+	<0> "*"  				{ getMul }
+	<0> "/"  				{ getDiv }
+	<0> "("  				{ getLPar }
+	<0> ")"					{ getRPar }
+	<0> ";"					{ getSemi }
 	
 {
 
@@ -184,19 +184,25 @@ nested_comment _ _ = do
                           '%' -> do
                               case alexGetByte input of
                                 Nothing  -> err input
-                                Just (10,input) -> go n input
-                                Just (c,input) -> skip input n 
+                                Just (c,input)  -> skip n input
                           '*' -> do
                               case alexGetByte input of
                                 Nothing  -> err input
                                 Just (47,input) -> go (n-1) input
-                                Just (c,input)   -> go n input
+                                Just (c,input)  -> go n input
                           '\47' -> do
                               case alexGetByte input of
                                 Nothing  -> err input
                                 Just (c,input) | c == fromIntegral (ord '*') -> go (n+1) input
                                 Just (c,input)   -> go n input
                           c -> go n input
+      skip n input = do
+              case alexGetByte input of
+                 Nothing  -> err input
+                 Just (c,input) -> do
+                      case chr (fromIntegral c) of
+                          '\10' -> go n input
+                          c -> skip n input
       err input = do 
         alexSetInput input;
         lexError $ "error in nested comment"
