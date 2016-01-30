@@ -1,9 +1,3 @@
---
--- CPSC411 Assignment1
--- Brian Yee
--- 00993104
--- T02
--- 
 
 {
 module Main (main) where
