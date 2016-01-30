@@ -1,45 +1,49 @@
+--
+-- CPSC411 Assignment1
+-- Brian Yee
+-- 00993104
+-- T02
+-- 
+
 {
 module Main (main) where
 
 import Data.Char (chr)
 import System.Environment
 
-
 }
 
 %wrapper "monad"
 
-$digit  = 0-9          -- digits
-$alpha  = [a-zA-Z]       -- alphabetic characters
-$newline = \n
+$digit  = 0-9          	-- digits
+$alpha  = [a-zA-Z]      -- alphabetic characters
+$newline = \n			
  
 tokens :-
-	<0> $white+		  		{ skip }
-	<0> "%" .* $newline	 		{ skip }
-	<0> "if" 				{ getIf }
-	<0> "then" 				{ getThen }
-	<0> "while" 				{ getWhile }
-	<0> "do" 				{ getDo }
-	<0> "input" 				{ getInput }
-	<0> "else" 				{ getElse }
-	<0> "begin" 				{ getBegin }
-	<0> "end" 				{ getEnd }
-	<0> "write" 				{ getWrite }	
-	<0> $digit+    				{ getNum }
-	<0> $alpha [$alpha $digit]*	    	{ getId }	
+	<0> $white+		  				{ skip }
+	<0> "%" .* $newline	 			{ skip }
+	<0> "if" 						{ makeLexeme IF }
+	<0> "then" 						{ makeLexeme THEN }
+	<0> "while" 					{ makeLexeme WHILE }
+	<0> "do" 						{ makeLexeme DO }
+	<0> "input" 					{ makeLexeme INPUT }
+	<0> "else" 						{ makeLexeme ELSE }
+	<0> "begin" 					{ makeLexeme BEGIN }
+	<0> "end" 						{ makeLexeme END }
+	<0> "write" 					{ makeLexeme WRITE }	
+	<0> $digit+    					{ \(p,c,b,s) len -> makeLexeme (NUM (read (take len s))) (p,c,b,s) len }
+	<0> $alpha [$alpha $digit]*	    { \(p,c,b,s) len -> makeLexeme (ID (take len s)) (p,c,b,s) len }	
 	<0> "/*"                		{ nested_comment } 
-	<0> "+"  				{ getAdd }
-	<0> ":="  				{ getAssign }
-	<0> "-"  				{ getSub }
-	<0> "*"  				{ getMul }
-	<0> "/"  				{ getDiv }
-	<0> "("  				{ getLPar }
-	<0> ")"					{ getRPar }
-	<0> ";"					{ getSemi }
+	<0> "+"  						{ makeLexeme ADD }
+	<0> ":="  						{ makeLexeme ASSIGN }
+	<0> "-"  						{ makeLexeme SUB }
+	<0> "*"  						{ makeLexeme MUL }
+	<0> "/"  						{ makeLexeme DIV }
+	<0> "("  						{ makeLexeme LPAR }
+	<0> ")"							{ makeLexeme RPAR }
+	<0> ";"							{ makeLexeme SEMICOLON }
 	
 {
-
-
 
 {-
 
@@ -76,85 +80,37 @@ type AlexAction result = AlexInput -> Int -> Alex result
 
  -}
 
-data Lexeme = IF AlexPosn	
-			| THEN AlexPosn          
-			| WHILE AlexPosn       
-			| DO AlexPosn          
-			| INPUT AlexPosn          
-			| ELSE AlexPosn	
-			| BEGIN AlexPosn          
-			| END AlexPosn       
-			| WRITE AlexPosn          
-			| ID String AlexPosn          
-			| NUM Int AlexPosn          
-			| ADD AlexPosn          
-			| ASSIGN AlexPosn       
-			| SUB AlexPosn          
-			| MUL AlexPosn          
-			| DIV AlexPosn          
-			| LPAR AlexPosn         
-			| RPAR AlexPosn         
-			| SEMICOLON AlexPosn  
+data LexemeType = IF
+			| THEN
+			| WHILE         
+			| DO            
+			| INPUT            
+			| ELSE  	
+			| BEGIN            
+			| END         
+			| WRITE            
+			| ID String            
+			| NUM Int            
+			| ADD            
+			| ASSIGN         
+			| SUB            
+			| MUL            
+			| DIV            
+			| LPAR           
+			| RPAR 			
+			| SEMICOLON
+  deriving (Show,Eq)
+			
+data Lexeme = L LexemeType AlexPosn	
 			| LEOF
   deriving (Show,Eq)
 
-getIf :: AlexInput -> Int -> Alex Lexeme
-getIf (posn,c,_,inp) len =  return $ IF posn
 
-getThen :: AlexInput -> Int -> Alex Lexeme
-getThen (posn,c,_,inp) len =  return $ THEN posn
-
-getWhile :: AlexInput -> Int -> Alex Lexeme
-getWhile (posn,c,_,inp) len =  return $ WHILE posn
-
-getDo :: AlexInput -> Int -> Alex Lexeme
-getDo (posn,c,_,inp) len =  return $ DO posn
-
-getInput :: AlexInput -> Int -> Alex Lexeme
-getInput (posn,c,_,inp) len =  return $ INPUT posn
-
-getElse :: AlexInput -> Int -> Alex Lexeme
-getElse (posn,c,_,inp) len =  return $ ELSE posn
-
-getBegin :: AlexInput -> Int -> Alex Lexeme
-getBegin (posn,c,_,inp) len =  return $ BEGIN posn
-
-getEnd :: AlexInput -> Int -> Alex Lexeme
-getEnd (posn,c,_,inp) len =  return $ END posn
-
-getWrite :: AlexInput -> Int -> Alex Lexeme
-getWrite (posn,c,_,inp) len =  return $ WRITE posn
-
-getId :: AlexInput -> Int -> Alex Lexeme
-getId (posn,c,_,inp) len =  return $ ID (take len inp) posn
-
-getNum :: AlexInput -> Int -> Alex Lexeme
-getNum (posn,c,_,inp) len =  return $ NUM (read (take len inp)) posn
-
-getAdd :: AlexInput -> Int -> Alex Lexeme
-getAdd (posn,c,_,inp) len =  return $ ADD posn
-
-getAssign :: AlexInput -> Int -> Alex Lexeme
-getAssign (posn,c,_,inp) len =  return $ ASSIGN posn
-
-getSub :: AlexInput -> Int -> Alex Lexeme
-getSub (posn,c,_,inp) len =  return $ SUB posn
-
-getMul :: AlexInput -> Int -> Alex Lexeme
-getMul (posn,c,_,inp) len =  return $ MUL posn
-
-getDiv :: AlexInput -> Int -> Alex Lexeme
-getDiv (posn,c,_,inp) len =  return $ DIV posn
-
-getLPar :: AlexInput -> Int -> Alex Lexeme
-getLPar (posn,c,_,inp) len =  return $ LPAR posn
-
-getRPar :: AlexInput -> Int -> Alex Lexeme
-getRPar (posn,c,_,inp) len =  return $ RPAR posn
-
-getSemi :: AlexInput -> Int -> Alex Lexeme
-getSemi (posn,c,_,inp) len =  return $ SEMICOLON posn
-
+{----------------------------------------------------------------------------------------------  
+	makeLexeme - Creates a Lexeme instance, with a given LexemeType & AlexInput  
+-----------------------------------------------------------------------------------------------}
+makeLexeme :: LexemeType -> AlexInput -> Int -> Alex Lexeme
+makeLexeme t (posn,c,_,inp) len =  return $ (L t posn)
 
 alexEOF = return LEOF
 
@@ -168,6 +124,10 @@ tokens str = runAlex str $ do
                loop
           
 
+{----------------------------------------------------------------------------------------------  
+	nested_comment 	- Iterates through the input by chararacter, tracking the number of 
+					- comment brackets exiting when enough closing brackets are found
+-----------------------------------------------------------------------------------------------}
 nested_comment :: AlexInput -> Int -> Alex Lexeme
 nested_comment _ _ = do
   input <- alexGetInput
@@ -177,7 +137,7 @@ nested_comment _ _ = do
          alexSetInput input
          alexMonadScan
       go n input = do
-              case alexGetByte input of
+              case alexGetByte input of						-- get next byte(char) of input
                  Nothing  -> err input
                  Just (c,input) -> do
                       case chr (fromIntegral c) of
@@ -186,16 +146,31 @@ nested_comment _ _ = do
                                 Nothing  -> err input
                                 Just (c,input)  -> skip n input
                           '*' -> do
-                              case alexGetByte input of
+                              case alexGetByte input of		-- get next byte(char) of input
                                 Nothing  -> err input
                                 Just (47,input) -> go (n-1) input
+                                Just (42,input)  -> asterisk n input
                                 Just (c,input)  -> go n input
                           '\47' -> do
                               case alexGetByte input of
                                 Nothing  -> err input
                                 Just (c,input) | c == fromIntegral (ord '*') -> go (n+1) input
                                 Just (c,input)   -> go n input
+                          c -> go n input                          
+{----------------------------------------------------------------------------------------------  
+	asterisk - Checks for '/' following an asterisk, 
+-----------------------------------------------------------------------------------------------}
+      asterisk n input = do									-- last character was an asterisk, so check for a slash next.
+              case alexGetByte input of
+                 Nothing  -> err input
+                 Just (c,input) -> do
+                      case chr (fromIntegral c) of
+                          '/' -> go (n-1) input
+                          '*' -> asterisk n input
                           c -> go n input
+{----------------------------------------------------------------------------------------------  
+	skip - Consumes characters until it finds '\n'
+-----------------------------------------------------------------------------------------------}
       skip n input = do
               case alexGetByte input of
                  Nothing  -> err input
@@ -239,4 +214,3 @@ main = do
                    
 
 }
-
