@@ -6,6 +6,7 @@
 %
 **/ 
 
+if
 then 					
 while 					
 do 						
@@ -14,8 +15,7 @@ else
 begin 					
 end 					
 write 					
-12342134 				
-alpha123123213*
+12342134alpha123123213   % NUM + ID
 /*  */              		
 +  						
 :=  					
