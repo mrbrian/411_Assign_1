@@ -137,7 +137,7 @@ nested_comment _ _ = do
          alexSetInput input
          alexMonadScan
       go n input = do
-              case alexGetByte input of						-- get next byte(char) of input
+              case alexGetByte input of						
                  Nothing  -> err input
                  Just (c,input) -> do
                       case chr (fromIntegral c) of
@@ -145,12 +145,7 @@ nested_comment _ _ = do
                               case alexGetByte input of
                                 Nothing  -> err input
                                 Just (c,input)  -> skip n input
-                          '*' -> do
-                              case alexGetByte input of		-- get next byte(char) of input
-                                Nothing  -> err input
-                                Just (47,input) -> go (n-1) input
-                                Just (42,input)  -> asterisk n input
-                                Just (c,input)  -> go n input
+                          '*' -> asterisk n input
                           '\47' -> do
                               case alexGetByte input of
                                 Nothing  -> err input
@@ -158,9 +153,9 @@ nested_comment _ _ = do
                                 Just (c,input)   -> go n input
                           c -> go n input                          
 {----------------------------------------------------------------------------------------------  
-	asterisk - Checks for '/' following an asterisk, 
+	asterisk - Checks if a '/' follows an asterisk then decreases comment depth
 -----------------------------------------------------------------------------------------------}
-      asterisk n input = do									-- last character was an asterisk, so check for a slash next.
+      asterisk n input = do									
               case alexGetByte input of
                  Nothing  -> err input
                  Just (c,input) -> do

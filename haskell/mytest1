@@ -1,11 +1,15 @@
-/*         
+/*        
 
 	Testing nested comments
 
 	% */  ignore bracket
     %%  ignore
-	
+/**
+/*
+
+*/  
 **/  
+***/  
 	
 	begin		
 	end   % output should only have begin and end

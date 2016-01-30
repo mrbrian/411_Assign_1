@@ -1,1 +1,10 @@
+/*
+
+	Testing nested comment error
+
+*/
+
 a*b+(
+
+/*
+	Open comment

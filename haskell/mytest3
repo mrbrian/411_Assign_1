@@ -1,8 +1,5 @@
-/*   
+//*   
 
 	Unrecognized tokens
 
 */
-
-!@#$%^& 	% should give error
-
