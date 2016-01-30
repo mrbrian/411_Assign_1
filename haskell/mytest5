@@ -1,0 +1,13 @@
+/*
+
+
+*/
+
+a /* comments ***/ + (c * d)
+
+a+1
+
+/*         
+	/* 		% ignore from here */   **/  to here
+
+*/ **/     % ignore from here on **/ 
