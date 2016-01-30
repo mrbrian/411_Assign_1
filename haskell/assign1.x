@@ -101,7 +101,7 @@ data LexemeType = IF
 			| SEMICOLON
   deriving (Show,Eq)
 			
-data Lexeme = L LexemeType AlexPosn	
+data Lexeme = LEX LexemeType AlexPosn	
 			| LEOF
   deriving (Show,Eq)
 
@@ -110,7 +110,7 @@ data Lexeme = L LexemeType AlexPosn
 	makeLexeme - Creates a Lexeme instance, with a given LexemeType & AlexInput  
 -----------------------------------------------------------------------------------------------}
 makeLexeme :: LexemeType -> AlexInput -> Int -> Alex Lexeme
-makeLexeme t (posn,c,_,inp) len =  return $ (L t posn)
+makeLexeme t (posn,c,_,inp) len =  return $ (LEX t posn)
 
 alexEOF = return LEOF
 
@@ -141,41 +141,38 @@ nested_comment _ _ = do
                  Nothing  -> err input
                  Just (c,input) -> do
                       case chr (fromIntegral c) of
-                          '%' -> do
-                              case alexGetByte input of
-                                Nothing  -> err input
-                                Just (c,input)  -> skip n input
-                          '*' -> asterisk n input
+                          '%' -> skip n input			-- skip until newline
+                          '*' -> asterisk n input		-- process asterisk(s)
                           '\47' -> do
                               case alexGetByte input of
                                 Nothing  -> err input
                                 Just (c,input) | c == fromIntegral (ord '*') -> go (n+1) input
                                 Just (c,input)   -> go n input
-                          c -> go n input                          
-{----------------------------------------------------------------------------------------------  
+                          c -> go n input  
+      err input = do 
+        alexSetInput input;
+        lexError $ "error in nested comment"                        
+{---------------------------------------------------------------------------------  
 	asterisk - Checks if a '/' follows an asterisk then decreases comment depth
------------------------------------------------------------------------------------------------}
+----------------------------------------------------------------------------------}
       asterisk n input = do									
               case alexGetByte input of
                  Nothing  -> err input
                  Just (c,input) -> do
                       case chr (fromIntegral c) of
-                          '/' -> go (n-1) input
-                          '*' -> asterisk n input
-                          c -> go n input
-{----------------------------------------------------------------------------------------------  
+                          '/' -> go (n-1) input			-- */ found, decrease depth
+                          '*' -> asterisk n input		-- keep processing asterisks
+                          c -> go n input				-- non-asterisk, return to normal processing
+{----------------------------------------------------- 
 	skip - Consumes characters until it finds '\n'
------------------------------------------------------------------------------------------------}
+------------------------------------------------------}
       skip n input = do
               case alexGetByte input of
                  Nothing  -> err input
                  Just (c,input) -> do
                       case chr (fromIntegral c) of
-                          '\10' -> go n input
-                          c -> skip n input
-      err input = do 
-        alexSetInput input;
-        lexError $ "error in nested comment"
+                          '\10' -> go n input			-- newline found, return to normal
+                          c -> skip n input				-- keep skipping
 
 
 showPosn (AlexPn _ line col) = show line ++ ':': show col

@@ -1,10 +1,27 @@
-/*
+/*         
 
-	Testing nested comment error
+	Testing all tokens
+	
+    % /*
+%
+**/ 
 
-*/
-
-a*b+(
-
-/*
-	Open comment
+then 					
+while 					
+do 						
+input 					
+else 					
+begin 					
+end 					
+write 					
+12342134 				
+alpha123123213*
+/*  */              		
++  						
+:=  					
+-  						
+*  						
+/  						
+(  						
+)						
+;						

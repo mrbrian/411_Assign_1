@@ -1,13 +1,35 @@
-/*
+
+hey there
+ /* {- Haskell style comments -} */
+
+Important  This is a cool little trick 
+
+comments 
+if 
+then
+while
+
+:= 5
+
+/*   %testing*/
 
 
+begin
+  x:=1;  % set x to 1!
+  y:=2;   /*
+  z:=3;  
+         % the really tricky thing is that 
+         % if I close a multiline comment, */ thus  in a 
+         % line comment it does not count!
+end
+
+/* yet more comments
+
+   v:= w-3;
+
+ **********/
+
+ /*
+    Testing!!!   % skip
 */
-
-a /* comments ***/ + (c * d);
-
-x := a+1;
-
-/*         
-	/* 		% ignore from here */   **/  to here
-
-*/ **/     % ignore from here on **/ 
+A   % output should just be A
