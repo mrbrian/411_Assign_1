@@ -1,3 +1,8 @@
+{-
+
+-}
+
+
 {
 module Main (main) where
 
@@ -150,8 +155,7 @@ nested_comment _ _ = do
                                 Just (c,input)   -> go n input
                           c -> go n input                          
 {----------------------------------------------------------------------------------------------  
-	asterisk 	- Iterates through the input by chararacter, tracking the number of 
-				- comment brackets exiting when enough closing brackets are found
+	asterisk - Iterates through the input by chararacter, tracking the number of 
 -----------------------------------------------------------------------------------------------}
       asterisk n input = do									-- last character was an asterisk, so check for a slash next.
               case alexGetByte input of
@@ -160,6 +164,9 @@ nested_comment _ _ = do
                       case chr (fromIntegral c) of
                           '\47' -> go (n-1) input
                           c -> asterisk n input
+{----------------------------------------------------------------------------------------------  
+	skip - Iterates through the input by chararacter, tracking the number of 
+-----------------------------------------------------------------------------------------------}
       skip n input = do
               case alexGetByte input of
                  Nothing  -> err input
