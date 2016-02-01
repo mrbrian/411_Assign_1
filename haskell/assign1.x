@@ -1,3 +1,9 @@
+--
+-- CPSC411 Assignment1
+-- Brian Yee
+-- 00993104
+-- T02
+-- 
 
 {
 module Main (main) where
@@ -95,16 +101,21 @@ data LexemeType = IF
 			| SEMICOLON
   deriving (Show,Eq)
 			
-data Lexeme = LEX LexemeType AlexPosn	
+data Lexeme = LEX LexemeType (Int, Int)	
 			| LEOF
   deriving (Show,Eq)
 
-
+{----------------------------------------------------------------------------------------------  
+	posnToPair - Takes a AlexPosn, and returns a line #, column # pair
+-----------------------------------------------------------------------------------------------}
+posnToPair :: AlexPosn -> (Int, Int)
+posnToPair (AlexPn _ a b) = (a, b)
+ 
 {----------------------------------------------------------------------------------------------  
 	makeLexeme - Creates a Lexeme instance, with a given LexemeType & AlexInput  
 -----------------------------------------------------------------------------------------------}
 makeLexeme :: LexemeType -> AlexInput -> Int -> Alex Lexeme
-makeLexeme t (posn,c,_,inp) len =  return $ (LEX t posn)
+makeLexeme t (posn,c,_,inp) len =  return $ (LEX t (posnToPair posn))
 
 alexEOF = return LEOF
 
@@ -194,7 +205,7 @@ main = do
                Right tok -> do
                    putStrLn "\n**************************************\n"
                    putStrLn "The List of tokens are as follows.\n"
-                   mapM_ (putStrLn.show) tok 
+                   mapM_ (putStrLn.show) tok
                Left msg -> do  
                   putStrLn msg    
                    
